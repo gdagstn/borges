@@ -1,5 +1,6 @@
-# borges
+<img src="https://user-images.githubusercontent.com/21171362/220794739-e8c7531f-46f4-4a5d-8439-f7a9ef4a5055.png" align="right" alt="" width="180" />
 
+# borges
 > Of *Exactitude in Science*
 >
 > ...In that Empire, the craft of Cartography attained such Perfection that the Map of a Single province covered the space of an entire City, and the Map of the Empire itself an entire Province. In the course of Time, these Extensive maps were found somehow wanting, and so the College of Cartographers evolved a Map of the Empire that was of the same Scale as the Empire and that coincided with it point for point. Less attentive to the Study of Cartography, succeeding Generations came to judge a map of such Magnitude cumbersome, and, not without Irreverence, they abandoned it to the Rigours of sun and Rain. In the western Deserts, tattered Fragments of the Map are still to be found, Sheltering an occasional Beast or beggar; in the whole Nation, no other relic is left of the Discipline of Geography.
