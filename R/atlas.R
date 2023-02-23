@@ -395,7 +395,7 @@ mapTheme <- function(theme) {
             "#857A52", "#6F7579", "#767068")
     background = "#c4e2e2"
     gridlines = "#a5cccc"
-    labelfont = "geographicahand"
+    labelfont = "serif"
     labelfill = "blanchedalmond"
     labelsize = 3
     border = 0.1
@@ -412,7 +412,7 @@ mapTheme <- function(theme) {
             "#E7F4F4", "#C6CFCF", "#777E79")
     background = "#81BFDF"
     gridlines = "#B5DDF4"
-    labelfont = "gotham"
+    labelfont = "sans"
     labelfill = "white"
     labelsize = 2.5
     border = 0.25
@@ -430,7 +430,7 @@ mapTheme <- function(theme) {
             "#B9B2A3", "#4D3936", "#8A7E7B", "#514C46")
     background = "#edecda"
     gridlines = "#d4d3c5"
-    labelfont = "terraignota"
+    labelfont = "serif"
     labelfill = "blanchedalmond"
     labelsize = 4
     border = 0.1
@@ -448,7 +448,7 @@ mapTheme <- function(theme) {
             "#434231", "#354335", "#362720", "#242537")
     background = "#A3AB95"
     gridlines = "#00000000"
-    labelfont = "gotenborg"
+    labelfont = "serif"
     labelsize = 4
     labelfill = "blanchedalmond"
     border = 0.25
