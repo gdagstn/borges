@@ -11,6 +11,8 @@
 
 This is all done through the use of [**`oveRlay`**](github.com/gdagstn/oveRlay), **`ggplot2`** and a few other libraries.
 
+**`borges`** is still very much **under development** so any feedback (especially bug reports) is more than welcome. 
+
 ## Install
 
 To install **`borges`** you will need to install first **`oveRlay`**.
