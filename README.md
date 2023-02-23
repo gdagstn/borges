@@ -1,4 +1,4 @@
-<img src="https://user-images.githubusercontent.com/21171362/220794739-e8c7531f-46f4-4a5d-8439-f7a9ef4a5055.png" align="right" alt="" width="180" />
+<img src="https://user-images.githubusercontent.com/21171362/220892837-bbabcf91-d6a5-45a9-835b-fa0a9b461f93.png" align="right" alt="" width="180" />
 
 # borges
 > Of *Exactitude in Science*
