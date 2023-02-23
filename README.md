@@ -37,7 +37,7 @@ This is quite a large file which will take a while to download.
 zeisel = scRNAseq::ZeiselNervousData()
 ```
 
-The Zeisel dataset has an "unnamed" `reducedDim` slot that contains a t-SNE embedding for cells of the nervous system.
+The Zeisel dataset has an "unnamed" `reducedDim` slot that contains a t-SNE embedding for cells of the nervous system. There are several labels in the `colData` slot, and we will choose one that offers a good balance between detail and redability.
 
 ```{r}
 zeiselatlas = prepAtlas(zeisel, 
