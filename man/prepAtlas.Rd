@@ -7,17 +7,18 @@
 prepAtlas(x, res = 300, labels, dimred = NULL, as_map = FALSE)
 }
 \arguments{
-\item{x}{one of the following: a `SingleCellExperiment` class object, a `data.frame` or a `matrix`}
+\item{x}{a \code{SingleCellExperiment} class object, OR a \code{matrix} with 2 columns, OR a \code{data.frame} with 2 columns.}
 
-\item{res}{numeric, the resolution of the boundary estimation via `oveRlay::makeOverlay()`. Default is 300}
+\item{res}{numeric, the resolution of the boundary estimation via \code{oveRlay::makeOverlay()}. Default is 300}
 
-\item{labels}{character scalar, the name of the column in `colData(x)` with labels, 
-if x is a `SingleCellExperiment` class object. Otherwise, a character vector or a factor}
+\item{labels}{character, the name of the column in \code{colData(sce)} with labels
+OR a character vector of labels of length \code{nrow(x)} if is a \code{matrix} or a \code{data.frame}}
 
-\item{dimred}{character, the name of the reduced dimension in `reducedDim(x)` to be used as basis. 
-Only used if x is a `SingleCellExperiment` class object.}
+\item{dimred}{character, the name of the reduced dimension in \code{reducedDim(sce)} 
+to be used as basis. Only used if \code{x} is a \code{SingleCellExperiment}.}
 
-\item{as_map}{logical, should the coordinates be changed to accommodate a geographical projection? Default is FALSE}
+\item{as_map}{logical, should the coordinates be changed to accommodate a 
+geographical projection? Default is FALSE}
 }
 \value{
 a list containing the following slots:

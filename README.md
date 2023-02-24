@@ -1,6 +1,7 @@
-<img src="https://user-images.githubusercontent.com/21171362/220892837-bbabcf91-d6a5-45a9-835b-fa0a9b461f93.png" align="right" alt="" width="180" />
+<img src="https://user-images.githubusercontent.com/21171362/220892837-bbabcf91-d6a5-45a9-835b-fa0a9b461f93.png" align="right" width="180"/>
 
 # borges
+
 > Of *Exactitude in Science*
 >
 > ...In that Empire, the craft of Cartography attained such Perfection that the Map of a Single province covered the space of an entire City, and the Map of the Empire itself an entire Province. In the course of Time, these Extensive maps were found somehow wanting, and so the College of Cartographers evolved a Map of the Empire that was of the same Scale as the Empire and that coincided with it point for point. Less attentive to the Study of Cartography, succeeding Generations came to judge a map of such Magnitude cumbersome, and, not without Irreverence, they abandoned it to the Rigours of sun and Rain. In the western Deserts, tattered Fragments of the Map are still to be found, Sheltering an occasional Beast or beggar; in the whole Nation, no other relic is left of the Discipline of Geography.
@@ -11,7 +12,7 @@
 
 This is all done through the use of [**`oveRlay`**](github.com/gdagstn/oveRlay), **`ggplot2`** and a few other libraries.
 
-**`borges`** is still very much **under development** so any feedback (especially bug reports) is more than welcome. 
+**`borges`** is still very much **under development** so any feedback (especially bug reports) is more than welcome.
 
 ## Install
 
@@ -28,7 +29,7 @@ remotes::install_github("gdagstn/borges")
 
 **`borges`** has only two functions:
 
-`prepAtlas()` to prepare the atlas coordinates from a `SingleCellExperiment` object, and `plotAtlas()` to display it as a `ggplot2` plot.
+`prepAtlas()` to prepare the atlas coordinates from a `SingleCellExperiment` object, a `matrix` or a `data.frame`, and `plotAtlas()` to display it as a `ggplot2` plot.
 
 For a practical demonstration, let's download a `SingleCellExperiment` object using the `scRNAseq` BioConductor package from Zeisel et al. 2018, "Molecular architecture of the mouse nervous system" ([link](https://doi.org/10.1016/j.cell.2018.06.021)).
 
@@ -68,6 +69,28 @@ The arguments of `plotAtlas()` allow you to control a few graphical elements:
 -   `show_labels` (logical) to show labels using `geom_label_repel()` from `ggrepel`
 
 -   `capitalize_labels` (logical) to capitalize all labels
+
+## Plotting generic 2D point clouds
+
+**`borges`** can also be used on any generic 2D point cloud represented as a `matrix` or `data.frame`, as long as they have two columns (the first one is taken to have coordinates in the x axis, and the second one in the y axis). Moreover, if you are supplying either `matrix` or `data.frame`, the `labels` argument must be a character vector with labels for every point.
+
+```{r}
+set.sedd(123)
+
+mats = rbind(matrix(rnorm(1000, 0, 1), ncol = 2),
+             matrix(rnorm(1000, 4, 1), ncol = 2),
+             matrix(rnorm(1000, -3, 1), ncol = 2))
+
+labels = c(rep("Cluster 1", 500),
+           rep("Cluster 2", 500),
+           rep("Cluster 3", 500))
+
+atl = prepAtlas(mats, res = 100, labels = labels)
+
+plotAtlas(atl)
+```
+
+<img src="https://user-images.githubusercontent.com/21171362/221169182-b38f56bf-f995-43b7-8cb1-909e0360ee26.png" width="400"/>
 
 ## Geographical projection
 

@@ -24,8 +24,9 @@
 #'
 #' @importFrom stats ksmooth
 
-smoothPolygon <- function(poly, smoothness = 3, min_points = 3, n_dense = 10) {
+smoothPolygon <- function(poly, smoothness = 3, min_points = 8, n_dense = 10) {
 
+  #if ()
   if (nrow(poly) < min_points) {
 
     poly_sm <- poly
@@ -151,5 +152,3 @@ makeBoundingBox <- function(bpg, stepsize = 1) {
 
   return(bound)
 }
-
-

@@ -2,7 +2,7 @@
 % Please edit documentation in R/atlas.R
 \name{plotAtlas}
 \alias{plotAtlas}
-\title{Plot an atlas}
+\title{Plot a SingleCellExperiment Atlas}
 \usage{
 plotAtlas(
   atlas_ret,
@@ -17,9 +17,9 @@ plotAtlas(
 )
 }
 \arguments{
-\item{atlas_ret}{a list as returned by `prepAtlas()`}
+\item{atlas_ret}{a list as returned by \code{prepAtlas()}}
 
-\item{plot_cells}{logical, should cells be plotted? Default is TRUE}
+\item{plot_cells}{logical, should cells/points be plotted? Default is TRUE}
 
 \item{add_contours}{logical, should density contours be drawn? Default is TRUE}
 
@@ -27,7 +27,7 @@ plotAtlas(
 
 \item{as_map}{logical, should the coordinates be changed to accommodate a geographical projection? Default is FALSE}
 
-\item{map_proj}{character, the map projection. Accepts any one character argument to `ggplot2::coord_map()`}
+\item{map_proj}{character, the map projection. Accepts any one character argument to \code{ggplot2::coord_map()}}
 
 \item{map_theme}{character, one of "classic" (default), "renaissance", "medieval", "modern"}
 
@@ -36,10 +36,10 @@ plotAtlas(
 \item{capitalize_labels}{logical, should labels be capitalized? Default is FALSE}
 }
 \value{
-a `ggplot2` plot object with an atlas-like representation of a 2D point cloud
+a \code{ggplot2} plot object with an atlas-like representation of a 2D point cloud
 }
 \description{
-Plots a 2D atlas with some graphical representation options
+Plots a 2D atlas from a SingleCellExperiment
 }
 \author{
 Giuseppe D'Agostino

@@ -2,13 +2,14 @@
 #'
 #' Prepares a 2D atlas for plotting
 #'
-#' @param x one of the following: a `SingleCellExperiment` class object, a `data.frame` or a `matrix`
-#' @param res numeric, the resolution of the boundary estimation via `oveRlay::makeOverlay()`. Default is 300
-#' @param labels character scalar, the name of the column in `colData(x)` with labels, 
-#'     if x is a `SingleCellExperiment` class object. Otherwise, a character vector or a factor
-#' @param dimred character, the name of the reduced dimension in `reducedDim(x)` to be used as basis. 
-#'     Only used if x is a `SingleCellExperiment` class object.
-#' @param as_map logical, should the coordinates be changed to accommodate a geographical projection? Default is FALSE
+#' @param x a \code{SingleCellExperiment} class object, OR a \code{matrix} with 2 columns, OR a \code{data.frame} with 2 columns. 
+#' @param res numeric, the resolution of the boundary estimation via \code{oveRlay::makeOverlay()}. Default is 300
+#' @param labels character, the name of the column in \code{colData(sce)} with labels
+#'     OR a character vector of labels of length \code{nrow(x)} if is a \code{matrix} or a \code{data.frame}
+#' @param dimred character, the name of the reduced dimension in \code{reducedDim(sce)} 
+#'     to be used as basis. Only used if \code{x} is a \code{SingleCellExperiment}.
+#' @param as_map logical, should the coordinates be changed to accommodate a 
+#'     geographical projection? Default is FALSE
 #'
 #' @return a list containing the following slots:
 #'    `atlas` - the atlas coordinates and labels;
@@ -27,100 +28,88 @@
 #' @export
 
 
-prepAtlas <- function(x,
-                      res = 300,
-                      labels,
-                      dimred = NULL,
-                      as_map = FALSE) {
-
+prepAtlas <- function (x, res = 300, labels, dimred = NULL, as_map = FALSE) {
   # Sanity checks
-  if(!is(x, "SingleCellExperiment") & !is(x, "data.frame") & !(is(x, "matrix"))) 
+  
+  if (!is(x, "SingleCellExperiment") & !is(x, "data.frame") & 
+      !(is(x, "matrix"))) 
     stop("You should provide either a `SingleCellExperiment` object, a data.frame, or a matrix.")
-  if(is(x, "SingleCellExperiment") & is.null(dimred)) 
+  if (is(x, "SingleCellExperiment") & is.null(dimred)) 
     stop("You should provide a dimensional reduction name (`dimred`) if you are using a `SingleCellExperiment` object as input.")
-  if(is(x, "SingleCellExperiment") & is.null(labels)) 
+  if (is(x, "SingleCellExperiment") & is.null(labels)) 
     stop("You should provide a `colData` column name for labels (`labels`) if you are using a `SingleCellExperiment` object as input.")
-  
-  if(!is(res, "numeric")) 
+  if (!is(res, "numeric")) 
     stop("`res` must be numeric")
-  if(res < 10) 
+  if (res < 10) 
     stop("`res` must be at least 10")
-  if((is(x, "matrix") | is(x, "data.frame")) & ncol(x) < 2) 
+  if ((is(x, "matrix") | is(x, "data.frame")) & ncol(x) < 2) 
     stop("`x` must contain at least two columns (x and y coordinates)")
-  
-  if(is(x, "SingleCellExperiment")) {
-    if(!labels %in% colnames(colData(x))) stop("`labels` not found in the colData slot of the SingleCellExperiment object")
-   if(!dimred %in% reducedDimNames(x)) stop("`dimred` not found in the reducedDim slot of the SingleCellExperiment object")
+  if (is(x, "SingleCellExperiment")) {
+    if (!labels %in% colnames(colData(x))) 
+      stop("`labels` not found in the colData slot of the SingleCellExperiment object")
+    if (!dimred %in% reducedDimNames(x)) 
+      stop("`dimred` not found in the reducedDim slot of the SingleCellExperiment object")
   }
-  
-  if(!is(x, "SingleCellExperiment") & 
-     (!is(labels, "character") & !is(labels, "factor"))) 
+  if (!is(x, "SingleCellExperiment") & (!is(labels, "character") & 
+                                        !is(labels, "factor"))) 
     stop("`labels` must be a character vector or a factor")
-  if(!is(x, "SingleCellExperiment") & 
-     (is(labels, "character") | !is(labels, "factor")) & 
-     length(labels) != nrow(x)) 
+  if (!is(x, "SingleCellExperiment") & (is(labels, "character") | 
+                                        !is(labels, "factor")) & length(labels) != nrow(x)) 
     stop("`labels` must have the same length as the number of points")
   
-  # end checks
+  # End checks
   
-  if(is(x, "SingleCellExperiment")) {
+  if (is(x, "SingleCellExperiment")) {
     dr = reducedDim(x, dimred)
-  } else {
+  }
+  else {
     dr = x
   }
-  
-  if(any(is.na(dr[,1]))) {
-    if(is(x, "SingleCellExperiment")) {
-      x = x[,which(!is.na(dr[,1]) & !is.na(dr[,2]))]
+  if (any(is.na(dr[, 1]))) {
+    if (is(x, "SingleCellExperiment")) {
+      x = x[, which(!is.na(dr[, 1]) & !is.na(dr[, 2]))]
       dr = reducedDim(x, dimred)
-    } else {
-      dr = dr[!is.na(dr[,1]) & !is.na(dr[,2]),]
+    }
+    else {
+      dr = dr[!is.na(dr[, 1]) & !is.na(dr[, 2]), ]
     }
   }
-
   colnames(dr) = c("x", "y")
-  
-  if(is(x, "SingleCellExperiment")) {
-    labels = colData(x)[,labels]
-  } else {
+  if (is(x, "SingleCellExperiment")) {
+    labels = colData(x)[, labels]
+  }
+  else {
     labels = labels
   }
-  
-  if(as_map) {
-    dr[,1] = rescale(dr[,1], to = c(-120, +120))
-    dr[,2] = rescale(dr[,2], to = c(-70, + 70))
+  if (as_map) {
+    dr[, 1] = rescale(dr[, 1], to = c(-120, +120))
+    dr[, 2] = rescale(dr[, 2], to = c(-70, +70))
   }
-
   atlas = makeBoundaries(data = dr, res = res, labels = labels)
-
-  coords = cbind(tapply(X = dr[,1], INDEX = labels, FUN = median),
-                 tapply(X = dr[,2], INDEX = labels, FUN = median))
-
+  coords = cbind(tapply(X = dr[, 1], INDEX = labels, FUN = median), 
+                 tapply(X = dr[, 2], INDEX = labels, FUN = median))
   colnames(coords) = c("x", "y")
   coords = as.data.frame(coords)
-
   coords$n = as.numeric(table(labels))
-
   ret = list(atlas = atlas, dr = dr, coords = coords, res = res)
-
   return(ret)
 }
 
-#' Plot an atlas
+#' Plot a SingleCellExperiment Atlas
 #'
-#' Plots a 2D atlas with some graphical representation options
+#' Plots a 2D atlas from a SingleCellExperiment
 #'
-#' @param atlas_ret a list as returned by `prepAtlas()`
-#' @param plot_cells logical, should cells be plotted? Default is TRUE
+#' @param atlas_ret a list as returned by \code{prepAtlas()}
+#' @param plot_cells logical, should cells/points be plotted? Default is TRUE
 #' @param add_contours logical, should density contours be drawn? Default is TRUE
 #' @param show_labels logical, should labels be plotted? Default is TRUE
 #' @param as_map logical, should the coordinates be changed to accommodate a geographical projection? Default is FALSE
-#' @param map_proj character, the map projection. Accepts any one character argument to `ggplot2::coord_map()`
+#' @param map_proj character, the map projection. Accepts any one character argument to \code{ggplot2::coord_map()}
 #' @param map_theme character, one of "classic" (default), "renaissance", "medieval", "modern"
 #' @param pal character, a vector of colors. Default is NULL and decided by the theme
 #' @param capitalize_labels logical, should labels be capitalized? Default is FALSE
 #'
-#' @return a `ggplot2` plot object with an atlas-like representation of a 2D point cloud
+#' @return a \code{ggplot2} plot object with an atlas-like representation of a 2D point cloud
 #'
 #' @author Giuseppe D'Agostino
 #'
@@ -139,6 +128,7 @@ prepAtlas <- function(x,
 plotAtlas <- function(atlas_ret, plot_cells = TRUE, add_contours = TRUE,
                       show_labels = TRUE, as_map = FALSE, map_proj = "lagrange",
                       map_theme = "classic", pal = NULL, capitalize_labels = FALSE) {
+
 
   atlas = atlas_ret$atlas
   dr = atlas_ret$dr
@@ -162,12 +152,10 @@ plotAtlas <- function(atlas_ret, plot_cells = TRUE, add_contours = TRUE,
     coords[,1] = rescale(coords[,1], to = range(coords[,2]))
   }
 
-  ovs = lapply(seq(0, 0.012, by = 0.004), function(offset) {
-                ov = makeOverlay(atlas[,1:2], res = res, offset_prop = offset)
-                ov = ov[ov$hole == "outer",]
-                return(ov)
-              })
-  
+  ov = makeOverlay(atlas[,1:2], res = res, offset_prop = 0)
+  ov1 = makeOverlay(atlas[,1:2], res = res, offset_prop = 0.004)
+  ov2 = makeOverlay(atlas[,1:2], res = res, offset_prop = 0.008)
+  ov3 = makeOverlay(atlas[,1:2], res = res, offset_prop = 0.012)
   kde = kde2d(dr[,1], dr[,2], n = 50)
   b2 = max(kde$z)
   b1 = 0 + diff(range(kde$z))/3
@@ -184,28 +172,28 @@ plotAtlas <- function(atlas_ret, plot_cells = TRUE, add_contours = TRUE,
     geom_polygon(linewidth = 0.5) +
     scale_fill_manual(values = maptheme$pal) +
     scale_color_manual(values = darken(maptheme$pal, amount = 0.5)) +
-    geom_polygon(data = ovs[[1]],
+    geom_polygon(data = ov,
                  inherit.aes = FALSE,
                  mapping = aes(x = .data[["x"]], y = .data[["y"]], group = .data[["id_hole"]]),
                  fill = NA,
                  linewidth = 0.3,
                  linetype = "solid",
                  col = rgb(0,0,0,0.5)) +
-    geom_polygon(data = ovs[[2]],
+    geom_polygon(data = ov1,
                  inherit.aes = FALSE,
                  mapping = aes(x = .data[["x"]], y = .data[["y"]], group = .data[["id_hole"]]),
                  fill = NA,
                  linewidth = 0.3,
                  linetype = "solid",
                  color = rgb(0,0,0,0.4)) +
-    geom_polygon(data = ovs[[3]],
+    geom_polygon(data = ov2,
                  inherit.aes = FALSE,
                  mapping = aes(x = .data[["x"]], y = .data[["y"]], group = .data[["id_hole"]]),
                  fill = NA,
                  linewidth = 0.3,
                  linetype = "22",
                  color = rgb(0,0,0,0.4)) +
-    geom_polygon(data = ovs[[4]],
+    geom_polygon(data = ov3,
                  inherit.aes = FALSE,
                  mapping = aes(x = .data[["x"]], y = .data[["y"]], group = .data[["id_hole"]]),
                  fill = NA,
