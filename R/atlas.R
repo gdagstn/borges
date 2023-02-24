@@ -2,10 +2,12 @@
 #'
 #' Prepares a 2D atlas for plotting
 #'
-#' @param sce a SingleCellExperiment class object
+#' @param x one of the following: a `SingleCellExperiment` class object, a `data.frame` or a `matrix`
 #' @param res numeric, the resolution of the boundary estimation via `oveRlay::makeOverlay()`. Default is 300
-#' @param labels character, the name of the column in `colData(sce)` with labels
-#' @param dimred character, the name of the reduced dimension in `reducedDim(sce)` to be used as basis
+#' @param labels character scalar, the name of the column in `colData(x)` with labels, 
+#'     if x is a `SingleCellExperiment` class object. Otherwise, a character vector or a factor
+#' @param dimred character, the name of the reduced dimension in `reducedDim(x)` to be used as basis. 
+#'     Only used if x is a `SingleCellExperiment` class object.
 #' @param as_map logical, should the coordinates be changed to accommodate a geographical projection? Default is FALSE
 #'
 #' @return a list containing the following slots:
@@ -19,33 +21,71 @@
 #' @importFrom SummarizedExperiment colData
 #' @importFrom SingleCellExperiment reducedDimNames reducedDim
 #' @importFrom methods is
+#' @importFrom scales rescale
 #' @importFrom stats median
 #'
 #' @export
 
 
-prepAtlas <- function(sce,
+prepAtlas <- function(x,
                       res = 300,
                       labels,
-                      dimred,
+                      dimred = NULL,
                       as_map = FALSE) {
 
   # Sanity checks
-  if(!is(sce, "SingleCellExperiment")) stop("You should provide a SingleCellExperiment object.")
-  if(!is(res, "numeric")) stop("`res` must be numeric")
-  if(res < 10) stop("`res` must be at least 10")
-  if(!labels %in% colnames(colData(sce))) stop("`labels` not found in the colData slot of the object")
-  if(!dimred %in% reducedDimNames(sce)) stop("`dimred` not found in the reducedDim slot of the object")
-
-  dr = reducedDim(sce, dimred)
+  if(!is(x, "SingleCellExperiment") & !is(x, "data.frame") & !(is(x, "matrix"))) 
+    stop("You should provide either a `SingleCellExperiment` object, a data.frame, or a matrix.")
+  if(is(x, "SingleCellExperiment") & is.null(dimred)) 
+    stop("You should provide a dimensional reduction name (`dimred`) if you are using a `SingleCellExperiment` object as input.")
+  if(is(x, "SingleCellExperiment") & is.null(labels)) 
+    stop("You should provide a `colData` column name for labels (`labels`) if you are using a `SingleCellExperiment` object as input.")
+  
+  if(!is(res, "numeric")) 
+    stop("`res` must be numeric")
+  if(res < 10) 
+    stop("`res` must be at least 10")
+  if((is(x, "matrix") | is(x, "data.frame")) & ncol(x) < 2) 
+    stop("`x` must contain at least two columns (x and y coordinates)")
+  
+  if(is(x, "SingleCellExperiment")) {
+    if(!labels %in% colnames(colData(x))) stop("`labels` not found in the colData slot of the SingleCellExperiment object")
+   if(!dimred %in% reducedDimNames(x)) stop("`dimred` not found in the reducedDim slot of the SingleCellExperiment object")
+  }
+  
+  if(!is(x, "SingleCellExperiment") & 
+     (!is(labels, "character") & !is(labels, "factor"))) 
+    stop("`labels` must be a character vector or a factor")
+  if(!is(x, "SingleCellExperiment") & 
+     (is(labels, "character") | !is(labels, "factor")) & 
+     length(labels) != nrow(x)) 
+    stop("`labels` must have the same length as the number of points")
+  
+  # end checks
+  
+  if(is(x, "SingleCellExperiment")) {
+    dr = reducedDim(x, dimred)
+  } else {
+    dr = x
+  }
+  
   if(any(is.na(dr[,1]))) {
-    sce = sce[,which(!is.na(dr[,1]) & !is.na(dr[,2]))]
-    dr = reducedDim(sce, dimred)
+    if(is(x, "SingleCellExperiment")) {
+      x = x[,which(!is.na(dr[,1]) & !is.na(dr[,2]))]
+      dr = reducedDim(x, dimred)
+    } else {
+      dr = dr[!is.na(dr[,1]) & !is.na(dr[,2]),]
+    }
   }
 
   colnames(dr) = c("x", "y")
-  labels = colData(sce)[,labels]
-
+  
+  if(is(x, "SingleCellExperiment")) {
+    labels = colData(x)[,labels]
+  } else {
+    labels = labels
+  }
+  
   if(as_map) {
     dr[,1] = rescale(dr[,1], to = c(-120, +120))
     dr[,2] = rescale(dr[,2], to = c(-70, + 70))
@@ -66,9 +106,9 @@ prepAtlas <- function(sce,
   return(ret)
 }
 
-#' Plot a SingleCellExperiment Atlas
+#' Plot an atlas
 #'
-#' Plots a 2D atlas from a SingleCellExperiment
+#' Plots a 2D atlas with some graphical representation options
 #'
 #' @param atlas_ret a list as returned by `prepAtlas()`
 #' @param plot_cells logical, should cells be plotted? Default is TRUE
@@ -100,7 +140,6 @@ plotAtlas <- function(atlas_ret, plot_cells = TRUE, add_contours = TRUE,
                       show_labels = TRUE, as_map = FALSE, map_proj = "lagrange",
                       map_theme = "classic", pal = NULL, capitalize_labels = FALSE) {
 
-
   atlas = atlas_ret$atlas
   dr = atlas_ret$dr
   coords = atlas_ret$coords
@@ -123,10 +162,12 @@ plotAtlas <- function(atlas_ret, plot_cells = TRUE, add_contours = TRUE,
     coords[,1] = rescale(coords[,1], to = range(coords[,2]))
   }
 
-  ov = makeOverlay(atlas[,1:2], res = res, offset_prop = 0)
-  ov1 = makeOverlay(atlas[,1:2], res = res, offset_prop = 0.004)
-  ov2 = makeOverlay(atlas[,1:2], res = res, offset_prop = 0.008)
-  ov3 = makeOverlay(atlas[,1:2], res = res, offset_prop = 0.012)
+  ovs = lapply(seq(0, 0.012, by = 0.004), function(offset) {
+                ov = makeOverlay(atlas[,1:2], res = res, offset_prop = offset)
+                ov = ov[ov$hole == "outer",]
+                return(ov)
+              })
+  
   kde = kde2d(dr[,1], dr[,2], n = 50)
   b2 = max(kde$z)
   b1 = 0 + diff(range(kde$z))/3
@@ -143,28 +184,28 @@ plotAtlas <- function(atlas_ret, plot_cells = TRUE, add_contours = TRUE,
     geom_polygon(linewidth = 0.5) +
     scale_fill_manual(values = maptheme$pal) +
     scale_color_manual(values = darken(maptheme$pal, amount = 0.5)) +
-    geom_polygon(data = ov,
+    geom_polygon(data = ovs[[1]],
                  inherit.aes = FALSE,
                  mapping = aes(x = .data[["x"]], y = .data[["y"]], group = .data[["id_hole"]]),
                  fill = NA,
                  linewidth = 0.3,
                  linetype = "solid",
                  col = rgb(0,0,0,0.5)) +
-    geom_polygon(data = ov1,
+    geom_polygon(data = ovs[[2]],
                  inherit.aes = FALSE,
                  mapping = aes(x = .data[["x"]], y = .data[["y"]], group = .data[["id_hole"]]),
                  fill = NA,
                  linewidth = 0.3,
                  linetype = "solid",
                  color = rgb(0,0,0,0.4)) +
-    geom_polygon(data = ov2,
+    geom_polygon(data = ovs[[3]],
                  inherit.aes = FALSE,
                  mapping = aes(x = .data[["x"]], y = .data[["y"]], group = .data[["id_hole"]]),
                  fill = NA,
                  linewidth = 0.3,
                  linetype = "22",
                  color = rgb(0,0,0,0.4)) +
-    geom_polygon(data = ov3,
+    geom_polygon(data = ovs[[4]],
                  inherit.aes = FALSE,
                  mapping = aes(x = .data[["x"]], y = .data[["y"]], group = .data[["id_hole"]]),
                  fill = NA,

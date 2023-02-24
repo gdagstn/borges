@@ -2,7 +2,7 @@
 % Please edit documentation in R/atlas.R
 \name{plotAtlas}
 \alias{plotAtlas}
-\title{Plot a SingleCellExperiment Atlas}
+\title{Plot an atlas}
 \usage{
 plotAtlas(
   atlas_ret,
@@ -39,5 +39,8 @@ plotAtlas(
 a `ggplot2` plot object with an atlas-like representation of a 2D point cloud
 }
 \description{
-Plots a 2D atlas from a SingleCellExperiment
+Plots a 2D atlas with some graphical representation options
+}
+\author{
+Giuseppe D'Agostino
 }

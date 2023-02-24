@@ -4,16 +4,18 @@
 \alias{prepAtlas}
 \title{Prepare a SingleCellExperiment Atlas}
 \usage{
-prepAtlas(sce, res = 300, labels, dimred, as_map = FALSE)
+prepAtlas(x, res = 300, labels, dimred = NULL, as_map = FALSE)
 }
 \arguments{
-\item{sce}{a SingleCellExperiment class object}
+\item{x}{one of the following: a `SingleCellExperiment` class object, a `data.frame` or a `matrix`}
 
 \item{res}{numeric, the resolution of the boundary estimation via `oveRlay::makeOverlay()`. Default is 300}
 
-\item{labels}{character, the name of the column in `colData(sce)` with labels}
+\item{labels}{character scalar, the name of the column in `colData(x)` with labels, 
+if x is a `SingleCellExperiment` class object. Otherwise, a character vector or a factor}
 
-\item{dimred}{character, the name of the reduced dimension in `reducedDim(sce)` to be used as basis}
+\item{dimred}{character, the name of the reduced dimension in `reducedDim(x)` to be used as basis. 
+Only used if x is a `SingleCellExperiment` class object.}
 
 \item{as_map}{logical, should the coordinates be changed to accommodate a geographical projection? Default is FALSE}
 }
@@ -26,4 +28,7 @@ a list containing the following slots:
 }
 \description{
 Prepares a 2D atlas for plotting
+}
+\author{
+Giuseppe D'Agostino
 }

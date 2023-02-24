@@ -4,7 +4,7 @@
 \alias{smoothPolygon}
 \title{Smooth polygons}
 \usage{
-smoothPolygon(poly, smoothness = 3, min_points = 8, n_dense = 10)
+smoothPolygon(poly, smoothness = 3, min_points = 3, n_dense = 10)
 }
 \arguments{
 \item{poly}{a data frame containing ordered coordinates with polygon vertices}
