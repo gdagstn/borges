@@ -76,7 +76,7 @@ The arguments of `plotAtlas()` allow you to control a few graphical elements:
 **`borges`** can also be used on any generic 2D point cloud represented as a `matrix` or `data.frame`, as long as they have two columns (the first one is taken to have coordinates in the x axis, and the second one in the y axis). Moreover, if you are supplying either `matrix` or `data.frame`, the `labels` argument must be a character vector with labels for every point.
 
 ```{r}
-set.sedd(123)
+set.seed(123)
 
 mats = rbind(matrix(rnorm(1000, 0, 1), ncol = 2),
              matrix(rnorm(1000, 4, 1), ncol = 2),
