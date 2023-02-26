@@ -54,7 +54,7 @@ prepAtlas <- function (x, res = 300, labels, dimred = NULL, as_map = FALSE) {
                                         !is(labels, "factor"))) 
     stop("`labels` must be a character vector or a factor")
   if (!is(x, "SingleCellExperiment") & (is(labels, "character") | 
-                                        !is(labels, "factor")) & length(labels) != nrow(x)) 
+                                        is(labels, "factor")) & length(labels) != nrow(x)) 
     stop("`labels` must have the same length as the number of points")
   
   # End checks
