@@ -147,7 +147,7 @@ plotAtlas <- function(atlas_ret, plot_cells = TRUE, add_contours = TRUE,
     if(!is.null(pal)) maptheme$pal = pal
     if(length(maptheme$pal) < nrow(coords)) {
       nrep = ceiling(nrow(coords)/length(maptheme$pal))+1
-      maptheme$pal = rep(maptheme$pal, nrep)[seq_len(ncolors)]
+      maptheme$pal = rep(maptheme$pal, nrep)[seq_len(nrow(coords))]
     }
   }
 
