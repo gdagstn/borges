@@ -14,10 +14,10 @@ prepAtlas(x, res = 300, labels, dimred = NULL, as_map = FALSE)
 \item{labels}{character, the name of the column in \code{colData(sce)} with labels
 OR a character vector of labels of length \code{nrow(x)} if is a \code{matrix} or a \code{data.frame}}
 
-\item{dimred}{character, the name of the reduced dimension in \code{reducedDim(sce)} 
+\item{dimred}{character, the name of the reduced dimension in \code{reducedDim(sce)}
 to be used as basis. Only used if \code{x} is a \code{SingleCellExperiment}.}
 
-\item{as_map}{logical, should the coordinates be changed to accommodate a 
+\item{as_map}{logical, should the coordinates be changed to accommodate a
 geographical projection? Default is FALSE}
 }
 \value{
