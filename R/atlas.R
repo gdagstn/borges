@@ -2,13 +2,13 @@
 #'
 #' Prepares a 2D atlas for plotting
 #'
-#' @param x a \code{SingleCellExperiment} class object, OR a \code{matrix} with 2 columns, OR a \code{data.frame} with 2 columns. 
+#' @param x a \code{SingleCellExperiment} class object, OR a \code{matrix} with 2 columns, OR a \code{data.frame} with 2 columns.
 #' @param res numeric, the resolution of the boundary estimation via \code{oveRlay::makeOverlay()}. Default is 300
 #' @param labels character, the name of the column in \code{colData(sce)} with labels
 #'     OR a character vector of labels of length \code{nrow(x)} if is a \code{matrix} or a \code{data.frame}
-#' @param dimred character, the name of the reduced dimension in \code{reducedDim(sce)} 
+#' @param dimred character, the name of the reduced dimension in \code{reducedDim(sce)}
 #'     to be used as basis. Only used if \code{x} is a \code{SingleCellExperiment}.
-#' @param as_map logical, should the coordinates be changed to accommodate a 
+#' @param as_map logical, should the coordinates be changed to accommodate a
 #'     geographical projection? Default is FALSE
 #'
 #' @return a list containing the following slots:
@@ -30,35 +30,35 @@
 
 prepAtlas <- function (x, res = 300, labels, dimred = NULL, as_map = FALSE) {
   # Sanity checks
-  
-  if (!is(x, "SingleCellExperiment") & !is(x, "data.frame") & 
-      !(is(x, "matrix"))) 
+
+  if (!is(x, "SingleCellExperiment") & !is(x, "data.frame") &
+      !(is(x, "matrix")))
     stop("You should provide either a `SingleCellExperiment` object, a data.frame, or a matrix.")
-  if (is(x, "SingleCellExperiment") & is.null(dimred)) 
+  if (is(x, "SingleCellExperiment") & is.null(dimred))
     stop("You should provide a dimensional reduction name (`dimred`) if you are using a `SingleCellExperiment` object as input.")
-  if (is(x, "SingleCellExperiment") & is.null(labels)) 
+  if (is(x, "SingleCellExperiment") & is.null(labels))
     stop("You should provide a `colData` column name for labels (`labels`) if you are using a `SingleCellExperiment` object as input.")
-  if (!is(res, "numeric")) 
+  if (!is(res, "numeric"))
     stop("`res` must be numeric")
-  if (res < 10) 
+  if (res < 10)
     stop("`res` must be at least 10")
-  if ((is(x, "matrix") | is(x, "data.frame")) & ncol(x) < 2) 
+  if ((is(x, "matrix") | is(x, "data.frame")) & ncol(x) < 2)
     stop("`x` must contain at least two columns (x and y coordinates)")
   if (is(x, "SingleCellExperiment")) {
-    if (!labels %in% colnames(colData(x))) 
+    if (!labels %in% colnames(colData(x)))
       stop("`labels` not found in the colData slot of the SingleCellExperiment object")
-    if (!dimred %in% reducedDimNames(x)) 
+    if (!dimred %in% reducedDimNames(x))
       stop("`dimred` not found in the reducedDim slot of the SingleCellExperiment object")
   }
-  if (!is(x, "SingleCellExperiment") & (!is(labels, "character") & 
-                                        !is(labels, "factor"))) 
+  if (!is(x, "SingleCellExperiment") & (!is(labels, "character") &
+                                        !is(labels, "factor")))
     stop("`labels` must be a character vector or a factor")
-  if (!is(x, "SingleCellExperiment") & (is(labels, "character") | 
-                                        is(labels, "factor")) & length(labels) != nrow(x)) 
+  if (!is(x, "SingleCellExperiment") & (is(labels, "character") |
+                                        is(labels, "factor")) & length(labels) != nrow(x))
     stop("`labels` must have the same length as the number of points")
-  
+
   # End checks
-  
+
   if (is(x, "SingleCellExperiment")) {
     dr = reducedDim(x, dimred)
   }
@@ -86,7 +86,7 @@ prepAtlas <- function (x, res = 300, labels, dimred = NULL, as_map = FALSE) {
     dr[, 2] = rescale(dr[, 2], to = c(-70, +70))
   }
   atlas = makeBoundaries(data = dr, res = res, labels = labels)
-  coords = cbind(tapply(X = dr[, 1], INDEX = labels, FUN = median), 
+  coords = cbind(tapply(X = dr[, 1], INDEX = labels, FUN = median),
                  tapply(X = dr[, 2], INDEX = labels, FUN = median))
   colnames(coords) = c("x", "y")
   coords = as.data.frame(coords)
@@ -129,7 +129,7 @@ prepAtlas <- function (x, res = 300, labels, dimred = NULL, as_map = FALSE) {
 #' @export
 
 plotAtlas <- function(atlas_ret, plot_cells = TRUE, add_contours = TRUE,
-                      show_labels = TRUE, shade_borders = TRUE, shade_offset = -1, 
+                      show_labels = TRUE, shade_borders = TRUE, shade_offset = -1,
                       shade_skip = 10, as_map = FALSE, map_proj = "lagrange",
                       map_theme = "classic", pal = NULL, capitalize_labels = FALSE) {
 
@@ -137,19 +137,31 @@ plotAtlas <- function(atlas_ret, plot_cells = TRUE, add_contours = TRUE,
   dr = atlas_ret$dr
   coords = atlas_ret$coords
   res = atlas_ret$res
-  
+
   if(shade_borders & (!is(shade_offset, "numeric") | !is(shade_skip, "numeric"))) stop("`shade_skip` and `shade_offset` must both be numeric")
-  
+
   if(is.null(pal) & is.null(map_theme)) stop("Must provide at least one of `pal` or `map_theme`")
 
   if(!is.null(map_theme)) {
     maptheme = mapTheme(map_theme)
     if(!is.null(pal)) maptheme$pal = pal
+    if(length(maptheme$pal) < nrow(coords)) {
+      nrep = ceiling(nrow(coords)/length(maptheme$pal))+1
+      maptheme$pal = rep(maptheme$pal, nrep)[seq_len(ncolors)]
+    }
   }
+
   if(is.null(map_theme)) {
     maptheme = mapTheme("classic")
-    if(!is.null(pal)) maptheme$pal = pal
+    if(!is.null(pal)) {
+      maptheme$pal = pal
+    }
+    if(length(maptheme$pal) < nrow(coords)) {
+        nrep = ceiling(nrow(coords)/length(maptheme$pal))+1
+        maptheme$pal = rep(maptheme$pal, nrep)[seq_len(ncolors)]
+      }
   }
+  print(maptheme$pal)
 
   if(!as_map) {
     dr[,1] = rescale(dr[,1], to = range(dr[,2]))
@@ -161,7 +173,7 @@ plotAtlas <- function(atlas_ret, plot_cells = TRUE, add_contours = TRUE,
   ov1 = makeOverlay(atlas[,1:2], res = res, offset_prop = 0.004)
   ov2 = makeOverlay(atlas[,1:2], res = res, offset_prop = 0.008)
   ov3 = makeOverlay(atlas[,1:2], res = res, offset_prop = 0.012)
-  
+
   kde = kde2d(dr[,1], dr[,2], n = 50)
   b2 = max(kde$z)
   b1 = 0 + diff(range(kde$z))/3
@@ -206,22 +218,22 @@ plotAtlas <- function(atlas_ret, plot_cells = TRUE, add_contours = TRUE,
                  linewidth = .3,
                  linetype = "13",
                  color = rgb(0,0,0,0.4))
-  
+
   names(p$layers) = c("waiver", "overlay1", "overlay2", "overlay3", "overlay4")
-  
+
   if(shade_borders) {
     shade = addShading(p$data, offset = shade_offset, skip = shade_skip)
-    p = p + geom_segment(data = shade, 
+    p = p + geom_segment(data = shade,
                          mapping = aes(x = x0, xend = x1,
                                        y = y0, yend = y1),
                          inherit.aes = FALSE,
                          color = "black",
                          #alpha = 0.2,
                          linewidth = 0.1)
-    
+
     names(p$layers)[length(p$layers)] = "shade"
   }
-  
+
   if(plot_cells) {
     point_alpha = (rescale(c(0, b1, b2), to = c(0, 1))/20)[2]
         p = p + geom_point(data = as.data.frame(dr),
@@ -229,9 +241,9 @@ plotAtlas <- function(atlas_ret, plot_cells = TRUE, add_contours = TRUE,
                        mapping = aes(x = .data[["x"]], y = .data[["y"]]),
                        size = 0.01,
                        color = rgb(0,0,0, 0.02))
-        
+
     names(p$layers)[length(p$layers)] = "points"
-    
+
   }
   if(add_contours) {
     p = p + geom_density_2d(data = as.data.frame(dr),
@@ -240,7 +252,7 @@ plotAtlas <- function(atlas_ret, plot_cells = TRUE, add_contours = TRUE,
                                           col = rgb(0,0,0,0.25),
                                           linewidth = 0.2,
                                           breaks = seq(b1, b2, length.out = 20))
-    
+
     names(p$layers)[length(p$layers)] = "kde_contours"
   }
   if(show_labels) {
@@ -531,7 +543,7 @@ polygonOffset <- function(x, y, d) {
   data.frame(x = d * cos(angle) + x, y = d * sin(angle) + y)
 }
 
-#' @importFrom polyclip pointinpolygon 
+#' @importFrom polyclip pointinpolygon
 #' @noRd
 
 addShading <- function(p, offset = -1, skip = 10) {
