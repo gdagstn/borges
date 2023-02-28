@@ -5,7 +5,7 @@
 
 > Of *Exactitude in Science*
 >
-> ...In that Empire, the craft of Cartography attained such Perfection that the Map of a Single province covered the space of an entire City, and the Map of the Empire itself an entire Province. In the course of Time, these Extensive maps were found somehow wanting, and so the College of Cartographers evolved a Map of the Empire that was of the same Scale as the Empire and that coincided with it point for point. Less attentive to the Study of Cartography, succeeding Generations came to judge a map of such Magnitude cumbersome, and, not without Irreverence, they abandoned it to the Rigours of sun and Rain. In the western Deserts, tattered Fragments of the Map are still to be found, Sheltering an occasional Beast or beggar; in the whole Nation, no other relic is left of the Discipline of Geography.
+> *...In that Empire, the craft of Cartography attained such Perfection that the Map of a Single province covered the space of an entire City, and the Map of the Empire itself an entire Province. In the course of Time, these Extensive maps were found somehow wanting, and so the College of Cartographers evolved a Map of the Empire that was of the same Scale as the Empire and that coincided with it point for point. Less attentive to the Study of Cartography, succeeding Generations came to judge a map of such Magnitude cumbersome, and, not without Irreverence, they abandoned it to the Rigours of sun and Rain. In the western Deserts, tattered Fragments of the Map are still to be found, Sheltering an occasional Beast or beggar; in the whole Nation, no other relic is left of the Discipline of Geography.*
 >
 > ---From Travels of Praiseworthy Men (1658) by J. A. Suarez Miranda
 
@@ -59,7 +59,7 @@ plotAtlas(zeiselatlas)
 
 <img src="https://user-images.githubusercontent.com/21171362/220776819-447f8394-0215-4a78-9f35-54c7c0968e0e.png" width="800"/>
 
-Note that plotting can take a few seconds to a minute due to the high level of detail. To have less detailed maps, you can set the `res` argument in `prepAtlas()` to a smaller value, e.g. 250 or 300.
+Note that plotting can take a few seconds to a minute due to the high level of detail. To have less detailed maps, you can set the `res` argument in `prepAtlas()` to a smaller value, e.g. 250 or 300, and `plot_cells = FALSE`.
 
 The arguments of `plotAtlas()` allow you to control a few graphical elements:
 
@@ -68,6 +68,12 @@ The arguments of `plotAtlas()` allow you to control a few graphical elements:
 -   `add_contours` (logical) to add 2D kernel density contour estimates, clipped to stay within land masses (mostly)
 
 -   `show_labels` (logical) to show labels using `geom_label_repel()` from `ggrepel`
+
+-   `shade_borders` (logical) to add an antique-style shading to the boundaries
+
+-   `shade_offset` (numeric) for the size and direction of the border
+
+-    `shade_skip` (numeric) for the spacing between shading lines
 
 -   `capitalize_labels` (logical) to capitalize all labels
 

@@ -9,6 +9,9 @@ plotAtlas(
   plot_cells = TRUE,
   add_contours = TRUE,
   show_labels = TRUE,
+  shade_borders = TRUE,
+  shade_offset = -1,
+  shade_skip = 10,
   as_map = FALSE,
   map_proj = "lagrange",
   map_theme = "classic",
@@ -24,6 +27,12 @@ plotAtlas(
 \item{add_contours}{logical, should density contours be drawn? Default is TRUE}
 
 \item{show_labels}{logical, should labels be plotted? Default is TRUE}
+
+\item{shade_borders}{logical, should borders be shaded? Default is TRUE}
+
+\item{shade_offset}{numeric, the length and direction of offset segments. Default is -1 (inwards).}
+
+\item{shade_skip}{numeric, the number of points to be skipped between shade segments. Default is 10.}
 
 \item{as_map}{logical, should the coordinates be changed to accommodate a geographical projection? Default is FALSE}
 

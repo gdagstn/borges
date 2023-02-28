@@ -103,6 +103,9 @@ prepAtlas <- function (x, res = 300, labels, dimred = NULL, as_map = FALSE) {
 #' @param plot_cells logical, should cells/points be plotted? Default is TRUE
 #' @param add_contours logical, should density contours be drawn? Default is TRUE
 #' @param show_labels logical, should labels be plotted? Default is TRUE
+#' @param shade_borders logical, should borders be shaded? Default is TRUE
+#' @param shade_offset numeric, the length and direction of offset segments. Default is -1 (inwards).
+#' @param shade_skip numeric, the number of points to be skipped between shade segments. Default is 10.
 #' @param as_map logical, should the coordinates be changed to accommodate a geographical projection? Default is FALSE
 #' @param map_proj character, the map projection. Accepts any one character argument to \code{ggplot2::coord_map()}
 #' @param map_theme character, one of "classic" (default), "renaissance", "medieval", "modern"
@@ -121,20 +124,22 @@ prepAtlas <- function (x, res = 300, labels, dimred = NULL, as_map = FALSE) {
 #' @importFrom ggplot2 ggplot aes .data geom_polygon geom_point geom_density_2d element_rect element_line unit
 #' @importFrom ggplot2 scale_x_continuous ylim theme_void theme coord_map coord_fixed scale_fill_manual scale_color_manual
 #' @importFrom ggrepel geom_label_repel
-#'
+#' @importFrom methods is
 #'
 #' @export
 
 plotAtlas <- function(atlas_ret, plot_cells = TRUE, add_contours = TRUE,
-                      show_labels = TRUE, as_map = FALSE, map_proj = "lagrange",
+                      show_labels = TRUE, shade_borders = TRUE, shade_offset = -1, 
+                      shade_skip = 10, as_map = FALSE, map_proj = "lagrange",
                       map_theme = "classic", pal = NULL, capitalize_labels = FALSE) {
-
 
   atlas = atlas_ret$atlas
   dr = atlas_ret$dr
   coords = atlas_ret$coords
   res = atlas_ret$res
-
+  
+  if(shade_borders & (!is(shade_offset, "numeric") | !is(shade_skip, "numeric"))) stop("`shade_skip` and `shade_offset` must both be numeric")
+  
   if(is.null(pal) & is.null(map_theme)) stop("Must provide at least one of `pal` or `map_theme`")
 
   if(!is.null(map_theme)) {
@@ -156,6 +161,7 @@ plotAtlas <- function(atlas_ret, plot_cells = TRUE, add_contours = TRUE,
   ov1 = makeOverlay(atlas[,1:2], res = res, offset_prop = 0.004)
   ov2 = makeOverlay(atlas[,1:2], res = res, offset_prop = 0.008)
   ov3 = makeOverlay(atlas[,1:2], res = res, offset_prop = 0.012)
+  
   kde = kde2d(dr[,1], dr[,2], n = 50)
   b2 = max(kde$z)
   b1 = 0 + diff(range(kde$z))/3
@@ -172,41 +178,60 @@ plotAtlas <- function(atlas_ret, plot_cells = TRUE, add_contours = TRUE,
     geom_polygon(linewidth = 0.5) +
     scale_fill_manual(values = maptheme$pal) +
     scale_color_manual(values = darken(maptheme$pal, amount = 0.5)) +
-    geom_polygon(data = ov,
+    geom_polygon(data = ov[ov$hole == "outer",],
                  inherit.aes = FALSE,
                  mapping = aes(x = .data[["x"]], y = .data[["y"]], group = .data[["id_hole"]]),
                  fill = NA,
                  linewidth = 0.3,
                  linetype = "solid",
                  col = rgb(0,0,0,0.5)) +
-    geom_polygon(data = ov1,
+    geom_polygon(data = ov1[ov1$hole == "outer",],
                  inherit.aes = FALSE,
                  mapping = aes(x = .data[["x"]], y = .data[["y"]], group = .data[["id_hole"]]),
                  fill = NA,
                  linewidth = 0.3,
                  linetype = "solid",
                  color = rgb(0,0,0,0.4)) +
-    geom_polygon(data = ov2,
+    geom_polygon(data = ov2[ov2$hole == "outer",],
                  inherit.aes = FALSE,
                  mapping = aes(x = .data[["x"]], y = .data[["y"]], group = .data[["id_hole"]]),
                  fill = NA,
                  linewidth = 0.3,
                  linetype = "22",
                  color = rgb(0,0,0,0.4)) +
-    geom_polygon(data = ov3,
+    geom_polygon(data = ov3[ov3$hole == "outer",],
                  inherit.aes = FALSE,
                  mapping = aes(x = .data[["x"]], y = .data[["y"]], group = .data[["id_hole"]]),
                  fill = NA,
                  linewidth = .3,
                  linetype = "13",
                  color = rgb(0,0,0,0.4))
+  
+  names(p$layers) = c("waiver", "overlay1", "overlay2", "overlay3", "overlay4")
+  
+  if(shade_borders) {
+    shade = addShading(p$data, offset = shade_offset, skip = shade_skip)
+    p = p + geom_segment(data = shade, 
+                         mapping = aes(x = x0, xend = x1,
+                                       y = y0, yend = y1),
+                         inherit.aes = FALSE,
+                         color = "black",
+                         #alpha = 0.2,
+                         linewidth = 0.1)
+    
+    names(p$layers)[length(p$layers)] = "shade"
+  }
+  
   if(plot_cells) {
-    point_alpha = (rescale(c(0, b1, b2), to = c(0, 1))/30)[2]
-    p = p + geom_point(data = as.data.frame(dr),
+    point_alpha = (rescale(c(0, b1, b2), to = c(0, 1))/20)[2]
+        p = p + geom_point(data = as.data.frame(dr),
                        inherit.aes = FALSE,
                        mapping = aes(x = .data[["x"]], y = .data[["y"]]),
                        size = 0.01,
                        color = rgb(0,0,0, 0.02))
+        
+    names(p$layers)[length(p$layers)] = "points"
+    
   }
   if(add_contours) {
     p = p + geom_density_2d(data = as.data.frame(dr),
@@ -215,6 +240,8 @@ plotAtlas <- function(atlas_ret, plot_cells = TRUE, add_contours = TRUE,
                                           col = rgb(0,0,0,0.25),
                                           linewidth = 0.2,
                                           breaks = seq(b1, b2, length.out = 20))
+    
+    names(p$layers)[length(p$layers)] = "kde_contours"
   }
   if(show_labels) {
 
@@ -229,6 +256,7 @@ plotAtlas <- function(atlas_ret, plot_cells = TRUE, add_contours = TRUE,
                              alpha = 0.8,
                              label.size = maptheme$border,
                              family = maptheme$labelfont)
+    names(p$layers)[length(p$layers)] = "labels"
 
   }
   p = p +
@@ -368,7 +396,7 @@ makeBoundaries = function (data, res, labels, stepsize = NULL, min_pts = NULL, m
 
     if(smooth) {
       ibl = split(ib_df, ib_df$cluster)
-      ibs = lapply(ibl, function(x) smoothPolygon(x))
+      ibs = lapply(ibl, function(x) smoothPolygon(x, min_points = 3))
       ib_df = as.data.frame(do.call(rbind, ibs))
     }
 
@@ -493,3 +521,28 @@ mapTheme <- function(theme) {
               border = border))
 }
 
+
+#' @details taken from https://stackoverflow.com/a/69936814/8391346
+#' @noRd
+
+polygonOffset <- function(x, y, d) {
+  angle <- atan2(diff(y), diff(x)) + pi/2
+  angle <- c(angle[1], angle)
+  data.frame(x = d * cos(angle) + x, y = d * sin(angle) + y)
+}
+
+#' @importFrom polyclip pointinpolygon 
+#' @noRd
+
+addShading <- function(p, offset = -1, skip = 10) {
+  p = p[seq(1, nrow(p), by = skip),]
+  p2 = polygonOffset(p$x, p$y, offset)
+  df = data.frame(x0 = p$x, x1 = p2$x, y0 = p$y, y1 = p2$y)
+  ins = lapply(split(p, p$cluster_label),
+               function(x) pointinpolygon(P = list(x = df$x1, y = df$y1),
+                                                     A = list(x = x$x, y = x$y)))
+  insdf = do.call(cbind, ins)
+  inp = which(rowSums(insdf) != 0)
+  df = df[inp,]
+  return(df)
+}
