@@ -161,7 +161,7 @@ plotAtlas <- function(atlas_ret, plot_cells = TRUE, add_contours = TRUE,
         maptheme$pal = rep(maptheme$pal, nrep)[seq_len(ncolors)]
       }
   }
-  print(maptheme$pal)
+
 
   if(!as_map) {
     dr[,1] = rescale(dr[,1], to = range(dr[,2]))
