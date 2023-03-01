@@ -18,6 +18,7 @@ Imports:
     MASS,
     methods,
     oveRlay,
+    polyclip,
     reshape2,
     scales,
     SingleCellExperiment,
