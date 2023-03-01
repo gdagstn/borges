@@ -121,7 +121,7 @@ prepAtlas <- function (x, res = 300, labels, dimred = NULL, as_map = FALSE) {
 #' @importFrom MASS kde2d
 #' @importFrom colorspace darken
 #' @importFrom grDevices rgb
-#' @importFrom ggplot2 ggplot aes .data geom_polygon geom_point geom_density_2d element_rect element_line unit
+#' @importFrom ggplot2 ggplot aes .data geom_polygon geom_point geom_density_2d element_rect element_line unit geom_segment
 #' @importFrom ggplot2 scale_x_continuous ylim theme_void theme coord_map coord_fixed scale_fill_manual scale_color_manual
 #' @importFrom ggrepel geom_label_repel
 #' @importFrom methods is
@@ -224,8 +224,10 @@ plotAtlas <- function(atlas_ret, plot_cells = TRUE, add_contours = TRUE,
   if(shade_borders) {
     shade = addShading(p$data, offset = shade_offset, skip = shade_skip)
     p = p + geom_segment(data = shade,
-                         mapping = aes(x = x0, xend = x1,
-                                       y = y0, yend = y1),
+                         mapping = aes(x = .data[["x0"]],
+                                       xend = .data[["x1"]],
+                                       y = .data[["y0"]],
+                                       yend = .data[["y1"]]),
                          inherit.aes = FALSE,
                          color = "black",
                          #alpha = 0.2,
