@@ -552,7 +552,7 @@ addShading <- function(p, offset = -1, skip = 10) {
   df = data.frame(x0 = p$x, x1 = p2$x, y0 = p$y, y1 = p2$y)
   ins = lapply(split(p, p$cluster_label),
                function(x) pointinpolygon(P = list(x = df$x1, y = df$y1),
-                                                     A = list(x = x$x, y = x$y)))
+                                          A = list(x = x$x, y = x$y)))
   insdf = do.call(cbind, ins)
   inp = which(rowSums(insdf) != 0)
   df = df[inp,]
