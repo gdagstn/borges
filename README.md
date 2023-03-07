@@ -9,11 +9,14 @@
 >
 > ---From Travels of Praiseworthy Men (1658) by J. A. Suarez Miranda
 
-**`borges`** is a small data visualization package that allows you to plot your single cell RNA-seq dataset as an antique or modern cartographic atlas. It uses 2D coordinates - be it UMAP, tSNE, PCA or anything else - and depicts cell labels as continuous territories in an ocean, separated by rivers or seas.
+**`borges`** is a small data visualization package that allows you to plot your single cell RNA-seq dataset (or any other dataset) as an antique or modern cartographic atlas. It uses 2D coordinates - be it UMAP, tSNE, PCA or anything else - and depicts group labels as continuous territories in an ocean, separated by rivers or seas.
 
 This is all done through the use of [**`oveRlay`**](github.com/gdagstn/oveRlay), **`ggplot2`** and a few other libraries.
-
 **`borges`** is still very much **under development** so any feedback (especially bug reports) is more than welcome.
+
+## Wait, should I take this seriously?
+If you are trying to represent high-dimensional data in 2D, not at all. All dimensional reduction techniques distort distances going from high dimensionality to low dimensionality, and non-linear techniques such as t-SNE and UMAP are very sensitive to tunable parameters (perplexity, number of neighbors, spread, etc) that do not depend on the input data. You can fiddle with as many of these parameters and RNG rounds as you want until you get something nice to show your friends. You can read more about it [here](https://www.biorxiv.org/content/10.1101/2021.08.25.457696v4). The purpose of **`borges`** is to make your beautiful, useless plots even more beautiful and slightly more useless. 
+If instead you are representing point clouds that have a rigorous justification for their embedding in a 2D space, then by all means use **`borges`** to make your beautiful, useful plots even more beautiful and slightly less useful. 
 
 ## Install
 
