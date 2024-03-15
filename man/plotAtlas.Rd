@@ -7,8 +7,10 @@
 plotAtlas(
   atlas_ret,
   plot_cells = TRUE,
+  alphascale = 20,
   add_contours = TRUE,
   show_labels = TRUE,
+  label_size = NULL,
   shade_borders = TRUE,
   shade_offset = -1,
   shade_skip = 10,
@@ -24,9 +26,14 @@ plotAtlas(
 
 \item{plot_cells}{logical, should cells/points be plotted? Default is TRUE}
 
+\item{alphascale}{numeric, the scaling parameter for point transparency. Default is 20}
+
 \item{add_contours}{logical, should density contours be drawn? Default is TRUE}
 
 \item{show_labels}{logical, should labels be plotted? Default is TRUE}
+
+\item{label_size}{numeric, the size of the labels. Default is NULL, meaning the
+map theme will determine the label size.}
 
 \item{shade_borders}{logical, should borders be shaded? Default is TRUE}
 

@@ -12,10 +12,12 @@
 #'     geographical projection? Default is FALSE
 #'
 #' @return a list containing the following slots:
-#'    `atlas` - the atlas coordinates and labels;
-#'    `dr` - a data.frame containing coordinates in 2D embedding of choice
-#'    `coords` - a data.frame containing coordinates for label positioning
-#'    `res` - the resolution used
+#' \itemize{
+#'   \item{"atlas"}{ - the atlas coordinates and labels}
+#'   \item{"dr"}{ - a data.frame containing coordinates in 2D embedding of choice}
+#'   \item{"coords"}{ - a data.frame containing coordinates for label positioning}
+#'   \item{"res"}{ - the resolution used}
+#'}
 #'
 #' @author Giuseppe D'Agostino
 #'
@@ -101,8 +103,11 @@ prepAtlas <- function (x, res = 300, labels, dimred = NULL, as_map = FALSE) {
 #'
 #' @param atlas_ret a list as returned by \code{prepAtlas()}
 #' @param plot_cells logical, should cells/points be plotted? Default is TRUE
+#' @param alphascale numeric, the scaling parameter for point transparency. Default is 20
 #' @param add_contours logical, should density contours be drawn? Default is TRUE
 #' @param show_labels logical, should labels be plotted? Default is TRUE
+#' @param label_size numeric, the size of the labels. Default is NULL, meaning the
+#'     map theme will determine the label size.
 #' @param shade_borders logical, should borders be shaded? Default is TRUE
 #' @param shade_offset numeric, the length and direction of offset segments. Default is -1 (inwards).
 #' @param shade_skip numeric, the number of points to be skipped between shade segments. Default is 10.
@@ -128,10 +133,11 @@ prepAtlas <- function (x, res = 300, labels, dimred = NULL, as_map = FALSE) {
 #'
 #' @export
 
-plotAtlas <- function(atlas_ret, plot_cells = TRUE, add_contours = TRUE,
-                      show_labels = TRUE, shade_borders = TRUE, shade_offset = -1,
-                      shade_skip = 10, as_map = FALSE, map_proj = "lagrange",
-                      map_theme = "classic", pal = NULL, capitalize_labels = FALSE) {
+plotAtlas <- function(atlas_ret, plot_cells = TRUE, alphascale = 20, add_contours = TRUE,
+                      show_labels = TRUE, label_size = NULL, shade_borders = TRUE, 
+                      shade_offset = -0.1, shade_skip = 10, as_map = FALSE, 
+                      map_proj = "lagrange", map_theme = "classic", 
+                      pal = NULL, capitalize_labels = FALSE) {
 
   atlas = atlas_ret$atlas
   dr = atlas_ret$dr
@@ -162,6 +168,9 @@ plotAtlas <- function(atlas_ret, plot_cells = TRUE, add_contours = TRUE,
       }
   }
 
+  if(!is.null(label_size)) {
+    maptheme$labelsize = label_size
+  }
 
   if(!as_map) {
     dr[,1] = rescale(dr[,1], to = range(dr[,2]))
@@ -237,12 +246,12 @@ plotAtlas <- function(atlas_ret, plot_cells = TRUE, add_contours = TRUE,
   }
 
   if(plot_cells) {
-    point_alpha = (rescale(c(0, b1, b2), to = c(0, 1))/20)[2]
+    point_alpha = (rescale(c(0, b1, b2), to = c(0, 1))/alphascale)[2]
         p = p + geom_point(data = as.data.frame(dr),
                        inherit.aes = FALSE,
                        mapping = aes(x = .data[["x"]], y = .data[["y"]]),
                        size = 0.01,
-                       color = rgb(0,0,0, 0.02))
+                       color = rgb(0,0,0, point_alpha))
 
     names(p$layers)[length(p$layers)] = "points"
 

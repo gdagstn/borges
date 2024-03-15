@@ -72,11 +72,13 @@ The arguments of `plotAtlas()` allow you to control a few graphical elements:
 
 -   `show_labels` (logical) to show labels using `geom_label_repel()` from `ggrepel`
 
+-   `label_size` (numeric) to override the default label size decided by the map theme
+
 -   `shade_borders` (logical) to add an antique-style shading to the boundaries
 
 -   `shade_offset` (numeric) for the size and direction of the border
 
--    `shade_skip` (numeric) for the spacing between shading lines
+-   `shade_skip` (numeric) for the spacing between shading lines
 
 -   `capitalize_labels` (logical) to capitalize all labels
 

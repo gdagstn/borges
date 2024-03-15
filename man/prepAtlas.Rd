@@ -22,10 +22,12 @@ geographical projection? Default is FALSE}
 }
 \value{
 a list containing the following slots:
-   `atlas` - the atlas coordinates and labels;
-   `dr` - a data.frame containing coordinates in 2D embedding of choice
-   `coords` - a data.frame containing coordinates for label positioning
-   `res` - the resolution used
+\itemize{
+  \item{"atlas"}{ - the atlas coordinates and labels}
+  \item{"dr"}{ - a data.frame containing coordinates in 2D embedding of choice}
+  \item{"coords"}{ - a data.frame containing coordinates for label positioning}
+  \item{"res"}{ - the resolution used}
+}
 }
 \description{
 Prepares a 2D atlas for plotting
