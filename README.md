@@ -1,7 +1,13 @@
 <img src="https://user-images.githubusercontent.com/21171362/220892837-bbabcf91-d6a5-45a9-835b-fa0a9b461f93.png" align="right" alt="" width="180" />
 
+<div id="toc">
+	<ul align="left" style="list-style: none;">
+		<summary>
+			<h1>borges</h1>
+		</summary>
+	</ul>
+</div>
 
-# borges
 
 > Of *Exactitude in Science*
 >
